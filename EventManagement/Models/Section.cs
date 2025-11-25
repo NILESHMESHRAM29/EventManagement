@@ -1,6 +1,6 @@
 ﻿namespace EventManagement.Models
 {
-    public class Sections
+    public class Section
     {
         public long Id { get; set; }
 

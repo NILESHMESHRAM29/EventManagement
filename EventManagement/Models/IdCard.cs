@@ -1,6 +1,6 @@
 ﻿namespace EventManagement.Models
 {
-    public class Id_Card
+    public class IdCard
     {
         public long Id { get; set; }
         public long StudentId { get; set; }
