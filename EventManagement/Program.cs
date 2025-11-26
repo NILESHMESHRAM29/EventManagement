@@ -1,4 +1,5 @@
 ﻿using EventManagement.Data;
+using EventManagement.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +69,14 @@ builder.Services.AddSwaggerGen(options =>
 // -----------------------------------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
+// validate required key early to avoid null being passed to Encoding.GetBytes
+var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
+var jwtIssuer = jwtSettings["Issuer"];
+var jwtAudience = jwtSettings["Audience"];
+
+// Register JwtService so it can be injected into controllers
+builder.Services.AddScoped<JwtService>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -82,10 +91,9 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
 
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidAudience = jwtSettings["Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtSettings["Key"]))
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
 

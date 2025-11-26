@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace EventManagement.Services
+namespace EventManagement.Service
 {
     public class JwtService
     {
@@ -21,18 +21,37 @@ namespace EventManagement.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role.Name)
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            if (!string.IsNullOrWhiteSpace(user?.Role?.Name))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, user.Role.Name));
+            }
+
+            var keyString = _config["Jwt:Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
+            byte[] keyBytes;
+            try
+            {
+                keyBytes = Convert.FromBase64String(keyString);
+            }
+            catch (FormatException)
+            {
+                keyBytes = Encoding.UTF8.GetBytes(keyString);
+            }
+
+            if (keyBytes.Length < 32)
+                throw new InvalidOperationException($"Jwt:Key is too short ({keyBytes.Length} bytes). Provide at least 32 bytes (256 bits).");
+
+            var key = new SymmetricSecurityKey(keyBytes);
+            var algorithm = keyBytes.Length >= 64 ? SecurityAlgorithms.HmacSha512 : SecurityAlgorithms.HmacSha256;
+            var creds = new SigningCredentials(key, algorithm);
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),  // Short lifetime = secure
+                expires: DateTime.UtcNow.AddMinutes(15),
                 signingCredentials: creds
             );
 
