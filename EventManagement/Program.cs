@@ -1,11 +1,15 @@
-using EventManagement.Data;
+﻿using EventManagement.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// -----------------------------------------------
+// DATABASE
+// -----------------------------------------------
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -13,13 +17,55 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Add services to the container.
-builder.Services.AddAuthorization();
+// -----------------------------------------------
+// CONTROLLERS
+// -----------------------------------------------
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
+// -----------------------------------------------
+// SWAGGER + JWT AUTH BUTTON
+// -----------------------------------------------
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Event Management API",
+        Version = "v1"
+    });
+
+    // 🔐 Add JWT security definition (makes Authorize button visible)
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter token like: Bearer {your JWT token}"
+    });
+
+    // 🔐 Add global security requirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme()
+            {
+                Reference = new OpenApiReference()
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
+
+// -----------------------------------------------
+// JWT AUTHENTICATION
+// -----------------------------------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
 builder.Services.AddAuthentication(options =>
@@ -35,6 +81,7 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
+
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(
@@ -42,9 +89,16 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// -----------------------------------------------
+// Authorization
+// -----------------------------------------------
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// -----------------------------------------------
+// PIPELINE
+// -----------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -53,7 +107,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// 🔥 MUST be above UseAuthorization
 app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();

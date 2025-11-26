@@ -2,8 +2,9 @@
 {
     public class ImportBatch
     {
-        public long Id { get; set; }
-        public long UploadedBy { get; set; }
+        public int Id { get; set; }
+        public int UploadedBy { get; set; }
+        public User UploadedByUser { get; set; }
         public int TotalRows { get; set; } = 0;
         public int ProcessedRows { get; set; } = 0;
         public bool IsCompleted { get; set; } = false;

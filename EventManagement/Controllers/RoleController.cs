@@ -1,14 +1,16 @@
 ﻿using EventManagement.Data;
+using EventManagement.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EventManagement.Controllers
 {
     [ApiController]
-    [Route ("api/[controller]")]
+    [Route("api/[controller]")]
     public class RoleController : ControllerBase
     {
         private readonly AppDbContext _context;
-        
+
         private RoleController(AppDbContext context)
         {
             _context = context;
@@ -34,4 +36,5 @@ namespace EventManagement.Controllers
             return CreatedAtAction(nameof(GetRole), new { id = role.Id }, role);
 
         }
+    }
 }
