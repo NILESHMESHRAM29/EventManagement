@@ -8,9 +8,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// -----------------------------------------------
-// DATABASE
-// -----------------------------------------------
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -18,14 +16,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// -----------------------------------------------
-// CONTROLLERS
-// -----------------------------------------------
+builder.Services.AddSingleton<EventManagement.Service.IPasswordHasherService, EventManagement.Service.PasswordHasherService>();
+
+builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
+
 builder.Services.AddControllers();
 
-// -----------------------------------------------
-// SWAGGER + JWT AUTH BUTTON
-// -----------------------------------------------
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -36,7 +32,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1"
     });
 
-    // 🔐 Add JWT security definition (makes Authorize button visible)
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -47,7 +42,7 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter token like: Bearer {your JWT token}"
     });
 
-    // 🔐 Add global security requirement
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -64,17 +59,15 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// -----------------------------------------------
-// JWT AUTHENTICATION
-// -----------------------------------------------
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
-// validate required key early to avoid null being passed to Encoding.GetBytes
+
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
 
-// Register JwtService so it can be injected into controllers
+
 builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddAuthentication(options =>
@@ -97,16 +90,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// -----------------------------------------------
-// Authorization
-// -----------------------------------------------
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// -----------------------------------------------
-// PIPELINE
-// -----------------------------------------------
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -115,7 +103,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// 🔥 MUST be above UseAuthorization
+
 app.UseAuthentication();
 
 app.UseAuthorization();

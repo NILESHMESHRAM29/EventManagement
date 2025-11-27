@@ -13,11 +13,13 @@ namespace EventManagement.Controllers
     {
         private readonly AppDbContext _db;
         private readonly JwtService _jwt;
+        private readonly IPasswordHasherService _hasher;
 
-        public AuthController(AppDbContext db, JwtService jwt)
+        public AuthController(AppDbContext db, JwtService jwt, IPasswordHasherService hasher)
         {
             _db = db;
             _jwt = jwt;
+            _hasher = hasher;
         }
 
         // ---------------- REGISTER ----------------
@@ -31,7 +33,7 @@ namespace EventManagement.Controllers
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Password = dto.Password,      // plain string
+                Password = _hasher.HashPassword(dto.Password),    
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -56,8 +58,8 @@ namespace EventManagement.Controllers
             if (user.LockoutEnd > DateTime.UtcNow)
                 return Unauthorized("Account locked. Try later.");
 
-            // Plain string password comparison
-            if (user.Password != dto.Password)
+            // verify hashed password
+            if (!_hasher.VerifyPassword(user.Password, dto.Password))
             {
                 user.FailedLoginAttempts++;
 
