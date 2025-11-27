@@ -8,6 +8,20 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// *************** Render PORT FIX ***************
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
+// ***********************************************
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 28))
+    )
+);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
