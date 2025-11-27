@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["EventManagement/EventManagement.csproj", "EventManagement/"]
-RUN dotnet restore "./EventManagement/EventManagement.csproj"
+COPY ["EventManagement.csproj", "."]
+RUN dotnet restore "./EventManagement.csproj"
 COPY . .
-WORKDIR "/src/EventManagement"
+WORKDIR "/src/."
 RUN dotnet build "./EventManagement.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
