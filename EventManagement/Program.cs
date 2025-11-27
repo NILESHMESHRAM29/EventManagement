@@ -113,15 +113,12 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 
-
-
-
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.MapGet("/", () => "Event Management API is running...");
+app.MapGet("/swagger", () => "Event Management API is running...");
 
 app.Run();
