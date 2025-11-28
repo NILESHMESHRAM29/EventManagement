@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+    options.UseNpgsql(connectionString)
 );
 
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
