@@ -16,26 +16,21 @@ builder.WebHost.ConfigureKestrel(options =>
 });
 // ***********************************************
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 28))
-    )
-);
+// *************** Configure MySQL DB ***************
+var env = builder.Environment.EnvironmentName; // "Development" or "Production"
+
+string connectionString = env == "Development"
+    ? builder.Configuration.GetConnectionString("LocalMySql")
+    : builder.Configuration.GetConnectionString("RailwayMySql");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 28))
-    )
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
-
-builder.Services.AddSingleton<EventManagement.Service.IPasswordHasherService, EventManagement.Service.PasswordHasherService>();
+// ***********************************************
 
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
@@ -56,7 +51,6 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Enter token like: Bearer {your JWT token}"
     });
 
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -73,14 +67,11 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-
 
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
-
 
 builder.Services.AddScoped<JwtService>();
 
@@ -104,7 +95,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
@@ -112,9 +102,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();
