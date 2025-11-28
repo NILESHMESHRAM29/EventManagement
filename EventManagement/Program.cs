@@ -8,25 +8,12 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// *************** Render PORT FIX ***************
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(int.Parse(port));
-});
-// ***********************************************
 
-// *************** Configure MySQL DB ***************
-var env = builder.Environment.EnvironmentName; // "Development" or "Production"
-
-string connectionString = env == "Development"
-    ? builder.Configuration.GetConnectionString("LocalMySql")
-    : builder.Configuration.GetConnectionString("RailwayMySql");
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
 );
-// ***********************************************
 
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 
