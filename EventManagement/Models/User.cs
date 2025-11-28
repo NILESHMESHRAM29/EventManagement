@@ -1,12 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data;
 
 namespace EventManagement.Models
 {
     public class User
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         [Required]
         public string Name { get; set; } = null!;
@@ -17,16 +15,16 @@ namespace EventManagement.Models
         public string? Mobile { get; set; }
 
         public bool IsSend { get; set; } = false;
-
         public bool IsIdCardDownloaded { get; set; } = false;
 
         public DateTime? EmailVerifiedAt { get; set; }
 
         [Required]
+        [MaxLength(255)]
         public string Password { get; set; } = null!;
 
-        public long? RoleId { get; set; }
-        [ForeignKey("RoleId")]
+        // Foreign Key
+        public int? RoleId { get; set; }
         public Role? Role { get; set; }
 
         public int Dept { get; set; } = 0;
@@ -35,9 +33,18 @@ namespace EventManagement.Models
 
         public bool IsDelete { get; set; } = false;
 
+        
         public bool IsApproved { get; set; } = false;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+
+        public ICollection<Student>? Students { get; set; }
+        public int FailedLoginAttempts { get; set; }
+        public DateTime? LockoutEnd { get; set; }
+
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
+
     }
 }

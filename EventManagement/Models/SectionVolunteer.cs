@@ -1,17 +1,13 @@
-﻿using static System.Collections.Specialized.BitVector32;
-
-namespace EventManagement.Models
+﻿namespace EventManagement.Models
 {
     public class SectionVolunteer
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
 
         // Foreign Keys
-        public long SectionId { get; set; }
-        public long UserId { get; set; }
-
-        // Navigation Properties (recommended)
+        public int SectionId { get; set; }
         public Section? Section { get; set; }
+        public int UserId { get; set; }
         public User? User { get; set; }
 
         public bool IsActive { get; set; } = true;
