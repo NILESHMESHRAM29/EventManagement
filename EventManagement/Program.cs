@@ -9,6 +9,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+<<<<<<< HEAD
 // QuestPDF license
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -18,22 +19,29 @@ builder.WebHost.ConfigureKestrel(options =>
 {
     options.ListenAnyIP(int.Parse(port));
 });
+=======
+
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79
 
 // -------------------- DbContext --------------------
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 28))
-    )
+    options.UseNpgsql(connectionString)
 );
 
+<<<<<<< HEAD
 // -------------------- Services --------------------
+=======
+>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79
 builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IdCardPdfService>(); // Important!
 builder.Services.AddControllers();
+<<<<<<< HEAD
 
 // -------------------- Swagger --------------------
+=======
+>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -61,11 +69,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+<<<<<<< HEAD
 // -------------------- JWT --------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Issuer");
 var jwtAudience = jwtSettings["Audience"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Audience");
+=======
+var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
+var jwtIssuer = jwtSettings["Issuer"];
+var jwtAudience = jwtSettings["Audience"];
+
+builder.Services.AddScoped<JwtService>();
+>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79
 
 builder.Services.AddAuthentication(options =>
 {
