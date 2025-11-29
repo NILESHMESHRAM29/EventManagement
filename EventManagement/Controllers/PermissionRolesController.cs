@@ -10,7 +10,7 @@ using EventManagement.Models;
 
 namespace EventManagement.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/permissionroles")]
     [ApiController]
     public class PermissionRolesController : ControllerBase
     {

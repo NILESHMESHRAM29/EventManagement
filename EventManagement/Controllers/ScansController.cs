@@ -10,7 +10,7 @@ using EventManagement.Models;
 
 namespace EventManagement.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/scans")]
     [ApiController]
     public class ScansController : ControllerBase
     {

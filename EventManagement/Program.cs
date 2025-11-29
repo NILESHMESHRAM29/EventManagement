@@ -8,7 +8,23 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ----------------------
+// 1️⃣ Add CORS for Angular
+// ----------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:4200", 
+            "https://eventmanagement-lwxj.onrender.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
+// DB connection
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -54,8 +70,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// JWT config
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
@@ -88,6 +104,11 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// ----------------------
+// 2️⃣ Enable CORS (MUST be before Authentication)
+// ----------------------
+app.UseCors("AngularPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();

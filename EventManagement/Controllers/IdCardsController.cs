@@ -10,7 +10,7 @@ using EventManagement.Models;
 
 namespace EventManagement.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/idCards")]
     [ApiController]
     public class IdCardsController : ControllerBase
     {
