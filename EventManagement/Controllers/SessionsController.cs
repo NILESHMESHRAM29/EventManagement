@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EventManagement.Data;
+using EventManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EventManagement.Data;
-using EventManagement.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EventManagement.Controllers
 {
@@ -20,14 +21,14 @@ namespace EventManagement.Controllers
         {
             _context = context;
         }
-
+        [Authorize]
         // GET: api/Sessions
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Session>>> GetSessions()
         {
             return await _context.Sessions.ToListAsync();
         }
-
+        [Authorize]
         // GET: api/Sessions/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Session>> GetSession(string id)
@@ -41,7 +42,7 @@ namespace EventManagement.Controllers
 
             return session;
         }
-
+        [Authorize]
         // PUT: api/Sessions/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,7 +73,7 @@ namespace EventManagement.Controllers
 
             return NoContent();
         }
-
+        [Authorize]
         // POST: api/Sessions
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -97,7 +98,7 @@ namespace EventManagement.Controllers
 
             return CreatedAtAction("GetSession", new { id = session.Id }, session);
         }
-
+        [Authorize]
         // DELETE: api/Sessions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSession(string id)

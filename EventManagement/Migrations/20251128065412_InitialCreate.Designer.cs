@@ -12,15 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-<<<<<<< HEAD:EventManagement/Migrations/20251128231115_InitialCreate.Designer.cs
 <<<<<<<< HEAD:EventManagement/Migrations/20251128065412_InitialCreate.Designer.cs
     [Migration("20251128065412_InitialCreate")]
 ========
     [Migration("20251128231115_InitialCreate")]
 >>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79:EventManagement/Migrations/20251128231115_InitialCreate.Designer.cs
-=======
-    [Migration("20251129074042_InitialCreate")]
->>>>>>> 6db23ed7363b1e7b7446589ee6d77922a2a39e8c:EventManagement/Migrations/20251129074042_InitialCreate.Designer.cs
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -48,7 +44,7 @@ namespace EventManagement.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("passwordresettokens", (string)null);
+                    b.ToTable("PasswordResetTokens", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
@@ -95,7 +91,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("events", (string)null);
+                    b.ToTable("Events");
                 });
 
             modelBuilder.Entity("EventManagement.Models.IdCard", b =>
@@ -135,7 +131,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("idcards", (string)null);
+                    b.ToTable("IdCards");
                 });
 
             modelBuilder.Entity("EventManagement.Models.ImportBatch", b =>
@@ -176,7 +172,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UploadedBy");
 
-                    b.ToTable("importbatches", (string)null);
+                    b.ToTable("ImportBatches");
                 });
 
             modelBuilder.Entity("EventManagement.Models.Permission", b =>
@@ -210,7 +206,7 @@ namespace EventManagement.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("permissions", (string)null);
+                    b.ToTable("Permissions");
                 });
 
             modelBuilder.Entity("EventManagement.Models.PermissionRole", b =>
@@ -251,7 +247,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("permission_roles", (string)null);
+                    b.ToTable("permission_role", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Role", b =>
@@ -330,7 +326,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("scans", (string)null);
+                    b.ToTable("Scans");
                 });
 
             modelBuilder.Entity("EventManagement.Models.Section", b =>
@@ -402,7 +398,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("section_volunteers", (string)null);
+                    b.ToTable("section_volunteer", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Session", b =>
@@ -434,7 +430,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("sessions", (string)null);
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Student", b =>
@@ -493,7 +489,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("students", (string)null);
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("EventManagement.Models.User", b =>
@@ -569,7 +565,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
