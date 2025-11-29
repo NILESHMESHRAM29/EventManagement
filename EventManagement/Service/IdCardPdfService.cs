@@ -39,17 +39,17 @@ namespace EventManagement.Service
                                         col.Item().AlignCenter().Image(logo, ImageScaling.FitWidth);
 
                                     // Photo
-                                    
+
 
                                     // Name & Role
                                     col.Item().PaddingTop(6).Text(item.dto.Name).Bold().FontSize(18).AlignCenter();
                                     if (!string.IsNullOrEmpty(item.dto.Role))
                                         col.Item().Text(item.dto.Role).Italic().FontSize(10).AlignCenter();
 
-                                    
-                                   
 
-                               
+
+
+
 
                                     // QR Code Section
                                     col.Item().PaddingTop(10).AlignCenter().Row(row =>
