@@ -29,11 +29,19 @@ namespace EventManagement.Controllers
             if (await _db.Users.AnyAsync(x => x.Email == dto.Email))
                 return BadRequest("Email already exists");
 
+            if (await _db.Users.AnyAsync(x => x.Mobile == dto.Mobile))
+                return BadRequest("Mobile number already exists");
+
+            // 🔐 Strong password validation
+            if (!IsValidPassword(dto.Password))
+                return BadRequest("Password must be at least 6 characters long and include uppercase, lowercase, number, and special character.");
+
             var user = new User
             {
                 Name = dto.Name,
                 Email = dto.Email,
-                Password = _hasher.HashPassword(dto.Password),    
+                Mobile = dto.Mobile,
+                Password = _hasher.HashPassword(dto.Password),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -43,6 +51,23 @@ namespace EventManagement.Controllers
 
             return Ok("Registration successful");
         }
+
+        // ==============================
+        // 🔐 Password Validation Method
+        // ==============================
+        private bool IsValidPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+                return false;
+
+            bool hasUpper = password.Any(char.IsUpper);
+            bool hasLower = password.Any(char.IsLower);
+            bool hasDigit = password.Any(char.IsDigit);
+            bool hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
+
+            return hasUpper && hasLower && hasDigit && hasSpecial;
+        }
+
 
         // ---------------- LOGIN ----------------
         [HttpPost("login")]

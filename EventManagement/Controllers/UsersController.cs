@@ -22,14 +22,14 @@ namespace EventManagement.Controllers
         {
             _context = context;
         }
-
+        [Authorize]
         // GET: api/Users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-
+        [Authorize]
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
@@ -43,7 +43,7 @@ namespace EventManagement.Controllers
 
             return user;
         }
-
+        [Authorize]
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -74,7 +74,7 @@ namespace EventManagement.Controllers
 
             return NoContent();
         }
-
+        [Authorize]
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -85,7 +85,7 @@ namespace EventManagement.Controllers
 
             return CreatedAtAction("GetUser", new { id = user.Id }, user);
         }
-
+        [Authorize]
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
