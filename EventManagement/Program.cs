@@ -10,6 +10,7 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // QuestPDF license
 QuestPDF.Settings.License = LicenseType.Community;
 
@@ -20,7 +21,25 @@ builder.WebHost.ConfigureKestrel(options =>
     options.ListenAnyIP(int.Parse(port));
 });
 =======
+=======
+// ----------------------
+// 1️⃣ Add CORS for Angular
+// ----------------------
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AngularPolicy", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:4200", 
+            "https://eventmanagement-lwxj.onrender.com")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+>>>>>>> 6db23ed7363b1e7b7446589ee6d77922a2a39e8c
 
+// DB connection
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 >>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79
 
@@ -70,14 +89,17 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 // -------------------- JWT --------------------
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Issuer");
 var jwtAudience = jwtSettings["Audience"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Audience");
 =======
+=======
+// JWT config
+>>>>>>> 6db23ed7363b1e7b7446589ee6d77922a2a39e8c
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-
 var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("Missing configuration: Jwt:Key");
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
@@ -117,6 +139,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+// ----------------------
+// 2️⃣ Enable CORS (MUST be before Authentication)
+// ----------------------
+app.UseCors("AngularPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace EventManagement.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/sections")]
     [ApiController]
     public class SectionsController : ControllerBase
     {

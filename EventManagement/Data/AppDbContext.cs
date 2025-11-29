@@ -2,7 +2,6 @@
 using EventManagement.Models;
 using Microsoft.EntityFrameworkCore;
 
-
 namespace EventManagement.Data
 {
     public class AppDbContext : DbContext
@@ -27,23 +26,27 @@ namespace EventManagement.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // USERS
+            // USERS - lowercase table
             modelBuilder.Entity<User>(entity =>
             {
+                entity.ToTable("users");
+
                 entity.HasIndex(e => e.Email)
-                    .IsUnique();
+                      .IsUnique();
 
                 entity.HasOne(u => u.Role)
-                    .WithMany()
-                    .HasForeignKey(u => u.RoleId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(u => u.RoleId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
+            // PASSWORD RESET TOKENS
             modelBuilder.Entity<PasswordResetToken>()
-                .ToTable("PasswordResetTokens");
-            
+                .ToTable("passwordresettokens");
+
+            // SESSIONS
             modelBuilder.Entity<Session>()
-                .ToTable("Sessions");
+                .ToTable("sessions");
 
             modelBuilder.Entity<Session>()
                 .HasOne(s => s.User)
@@ -57,62 +60,65 @@ namespace EventManagement.Data
             // STUDENTS
             modelBuilder.Entity<Student>(entity =>
             {
+                entity.ToTable("students");
+
                 entity.HasIndex(e => e.UniqueId)
-                    .IsUnique();
+                      .IsUnique();
 
                 entity.HasIndex(e => e.QrCodePath)
-                    .IsUnique(false);
+                      .IsUnique(false);
 
                 entity.HasOne(s => s.User)
-                    .WithMany(u => u.Students)
-                    .HasForeignKey(s => s.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany(u => u.Students)
+                      .HasForeignKey(s => s.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(s => s.AddedByUser)
-                    .WithMany()
-                    .HasForeignKey(s => s.AddedBy)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.SetNull);
+                      .WithMany()
+                      .HasForeignKey(s => s.AddedBy)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
 
                 entity.HasOne(s => s.UpdateByUser)
-                    .WithMany()
-                    .HasForeignKey(s => s.UpdateBy)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.SetNull);
+                      .WithMany()
+                      .HasForeignKey(s => s.UpdateBy)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.SetNull);
 
                 entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                      .HasDefaultValue(false);
 
-                // Force plain datetime (no precision) for compatibility with older MySQL
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SCANS
             modelBuilder.Entity<Scan>(entity =>
             {
-                    entity.HasOne(s => s.Student)
-                        .WithMany()
-                        .HasForeignKey(s => s.StudentId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                entity.ToTable("scans");
 
-                    entity.HasOne(s => s.User)
-                        .WithMany()
-                        .HasForeignKey(s => s.UserId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(s => s.Student)
+                      .WithMany()
+                      .HasForeignKey(s => s.StudentId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                    entity.HasOne(s => s.Section)
-                        .WithMany()
-                        .HasForeignKey(s => s.SectionId)
-                        .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(s => s.User)
+                      .WithMany()
+                      .HasForeignKey(s => s.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                    entity.Property(e => e.IsDelete)
-                        .HasDefaultValue(false);
+                entity.HasOne(s => s.Section)
+                      .WithMany()
+                      .HasForeignKey(s => s.SectionId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                    entity.Property(e => e.CreatedAt)
-                        .HasColumnType("timestamp")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.IsDelete)
+                      .HasDefaultValue(false);
+
+                entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ROLES
@@ -121,168 +127,160 @@ namespace EventManagement.Data
                 entity.ToTable("roles");
 
                 entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                      .IsRequired()
+                      .HasMaxLength(100);
 
                 entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                      .HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
-
-
 
             // IMPORT BATCHES
             modelBuilder.Entity<ImportBatch>(entity =>
             {
+                entity.ToTable("importbatches");
+
                 entity.HasOne(b => b.UploadedByUser)
-                    .WithMany()
-                    .HasForeignKey(b => b.UploadedBy)
-                    .IsRequired()
-                    .OnDelete(DeleteBehavior.Restrict);
+                      .WithMany()
+                      .HasForeignKey(b => b.UploadedBy)
+                      .IsRequired()
+                      .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.TotalRows)
-                    .HasDefaultValue(0);
-
-                entity.Property(e => e.ProcessedRows)
-                    .HasDefaultValue(0);
-
-                entity.Property(e => e.IsCompleted)
-                    .HasDefaultValue(false);
+                entity.Property(e => e.TotalRows).HasDefaultValue(0);
+                entity.Property(e => e.ProcessedRows).HasDefaultValue(0);
+                entity.Property(e => e.IsCompleted).HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
-
-
 
             // ID CARDS
             modelBuilder.Entity<IdCard>(entity =>
             {
-                entity.HasOne(i => i.Student)
-                    .WithMany()
-                    .HasForeignKey(i => i.StudentId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.ToTable("idcards");
 
-                entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                entity.HasOne(i => i.Student)
+                      .WithMany()
+                      .HasForeignKey(i => i.StudentId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // PERMISSION ROLE
             modelBuilder.Entity<PermissionRole>(entity =>
             {
-                entity.ToTable("permission_role");
+                entity.ToTable("permission_roles");
 
                 entity.HasOne(pr => pr.Role)
-                    .WithMany()
-                    .HasForeignKey(pr => pr.RoleId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(pr => pr.RoleId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(pr => pr.Permission)
-                    .WithMany()
-                    .HasForeignKey(pr => pr.PermissionId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(pr => pr.PermissionId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.IsActive)
-                    .HasDefaultValue(true);
-
-                entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
-
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
-            // PREMISSIONS
+            // PERMISSIONS
             modelBuilder.Entity<Permission>(entity =>
             {
+                entity.ToTable("permissions");
+
                 entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(100);
+                      .IsRequired()
+                      .HasMaxLength(100);
 
                 entity.HasIndex(e => e.Name)
-                    .IsUnique();
+                      .IsUnique();
 
                 entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                      .HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // EVENTS
             modelBuilder.Entity<Event>(entity =>
             {
+                entity.ToTable("events");
+
                 entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                      .HasDefaultValue(false);
 
                 entity.HasOne(e => e.AddedByUser)
-                    .WithMany()
-                    .HasForeignKey(e => e.AddedBy)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.Restrict);
+                      .WithMany()
+                      .HasForeignKey(e => e.AddedBy)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.UpdatedByUser)
-                    .WithMany()
-                    .HasForeignKey(e => e.UpdatedBy)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.Restrict);
+                      .WithMany()
+                      .HasForeignKey(e => e.UpdatedBy)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
-
 
             // SECTIONS
             modelBuilder.Entity<Section>(entity =>
             {
                 entity.ToTable("sections");
 
-                entity.Property(e => e.IsDelete)
-                    .HasDefaultValue(false);
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
 
                 entity.HasOne(s => s.AddedByUser)
-                    .WithMany()
-                    .HasForeignKey(s => s.AddedBy)
-                    .IsRequired(false)
-                    .OnDelete(DeleteBehavior.Restrict);
+                      .WithMany()
+                      .HasForeignKey(s => s.AddedBy)
+                      .IsRequired(false)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SECTION VOLUNTEERS
             modelBuilder.Entity<SectionVolunteer>(entity =>
             {
-                entity.ToTable("section_volunteer");
+                entity.ToTable("section_volunteers");
 
                 entity.HasOne(sv => sv.Section)
-                    .WithMany()
-                    .HasForeignKey(sv => sv.SectionId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(sv => sv.SectionId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(sv => sv.User)
-                    .WithMany()
-                    .HasForeignKey(sv => sv.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                      .WithMany()
+                      .HasForeignKey(sv => sv.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
 
                 entity.Property(e => e.IsActive)
-                    .HasDefaultValue(true);
+                      .HasDefaultValue(true);
 
                 entity.Property(e => e.CreatedAt)
-                    .HasColumnType("timestamp")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }

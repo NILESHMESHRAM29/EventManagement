@@ -13,7 +13,7 @@ namespace EventManagement.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "PasswordResetTokens",
+                name: "passwordresettokens",
                 columns: table => new
                 {
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
@@ -22,11 +22,11 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PasswordResetTokens", x => x.Email);
+                    table.PrimaryKey("PK_passwordresettokens", x => x.Email);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Permissions",
+                name: "permissions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -38,7 +38,7 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Permissions", x => x.Id);
+                    table.PrimaryKey("PK_permissions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,7 +58,7 @@ namespace EventManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "permission_role",
+                name: "permission_roles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -72,15 +72,15 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_permission_role", x => x.Id);
+                    table.PrimaryKey("PK_permission_roles", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_permission_role_Permissions_PermissionId",
+                        name: "FK_permission_roles_permissions_PermissionId",
                         column: x => x.PermissionId,
-                        principalTable: "Permissions",
+                        principalTable: "permissions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_permission_role_roles_RoleId",
+                        name: "FK_permission_roles_roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "roles",
                         principalColumn: "Id",
@@ -88,7 +88,7 @@ namespace EventManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -114,9 +114,9 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_roles_RoleId",
+                        name: "FK_users_roles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "roles",
                         principalColumn: "Id",
@@ -124,7 +124,7 @@ namespace EventManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "events",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -140,23 +140,23 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.PrimaryKey("PK_events", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Events_Users_AddedBy",
+                        name: "FK_events_users_AddedBy",
                         column: x => x.AddedBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Events_Users_UpdatedBy",
+                        name: "FK_events_users_UpdatedBy",
                         column: x => x.UpdatedBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ImportBatches",
+                name: "importbatches",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -170,11 +170,11 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ImportBatches", x => x.Id);
+                    table.PrimaryKey("PK_importbatches", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ImportBatches_Users_UploadedBy",
+                        name: "FK_importbatches_users_UploadedBy",
                         column: x => x.UploadedBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -195,15 +195,15 @@ namespace EventManagement.Migrations
                 {
                     table.PrimaryKey("PK_sections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_sections_Users_AddedBy",
+                        name: "FK_sections_users_AddedBy",
                         column: x => x.AddedBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sessions",
+                name: "sessions",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(450)", maxLength: 450, nullable: false),
@@ -215,16 +215,16 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sessions", x => x.Id);
+                    table.PrimaryKey("PK_sessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Sessions_Users_UserId",
+                        name: "FK_sessions_users_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
+                name: "students",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -241,29 +241,29 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Students", x => x.Id);
+                    table.PrimaryKey("PK_students", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Students_Users_AddedBy",
+                        name: "FK_students_users_AddedBy",
                         column: x => x.AddedBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Students_Users_UpdateBy",
+                        name: "FK_students_users_UpdateBy",
                         column: x => x.UpdateBy,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Students_Users_UserId",
+                        name: "FK_students_users_UserId",
                         column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "section_volunteer",
+                name: "section_volunteers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -276,23 +276,23 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_section_volunteer", x => x.Id);
+                    table.PrimaryKey("PK_section_volunteers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_section_volunteer_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_section_volunteers_sections_SectionId",
+                        column: x => x.SectionId,
+                        principalTable: "sections",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_section_volunteer_sections_SectionId",
-                        column: x => x.SectionId,
-                        principalTable: "sections",
+                        name: "FK_section_volunteers_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "IdCards",
+                name: "idcards",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -306,17 +306,17 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IdCards", x => x.Id);
+                    table.PrimaryKey("PK_idcards", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdCards_Students_StudentId",
+                        name: "FK_idcards_students_StudentId",
                         column: x => x.StudentId,
-                        principalTable: "Students",
+                        principalTable: "students",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Scans",
+                name: "scans",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -332,86 +332,86 @@ namespace EventManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scans", x => x.Id);
+                    table.PrimaryKey("PK_scans", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Scans_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Scans_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Scans_sections_SectionId",
+                        name: "FK_scans_sections_SectionId",
                         column: x => x.SectionId,
                         principalTable: "sections",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_scans_students_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "students",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_scans_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_AddedBy",
-                table: "Events",
+                name: "IX_events_AddedBy",
+                table: "events",
                 column: "AddedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_UpdatedBy",
-                table: "Events",
+                name: "IX_events_UpdatedBy",
+                table: "events",
                 column: "UpdatedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IdCards_StudentId",
-                table: "IdCards",
+                name: "IX_idcards_StudentId",
+                table: "idcards",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ImportBatches_UploadedBy",
-                table: "ImportBatches",
+                name: "IX_importbatches_UploadedBy",
+                table: "importbatches",
                 column: "UploadedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_permission_role_PermissionId",
-                table: "permission_role",
+                name: "IX_permission_roles_PermissionId",
+                table: "permission_roles",
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_permission_role_RoleId",
-                table: "permission_role",
+                name: "IX_permission_roles_RoleId",
+                table: "permission_roles",
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Permissions_Name",
-                table: "Permissions",
+                name: "IX_permissions_Name",
+                table: "permissions",
                 column: "Name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scans_SectionId",
-                table: "Scans",
+                name: "IX_scans_SectionId",
+                table: "scans",
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scans_StudentId",
-                table: "Scans",
+                name: "IX_scans_StudentId",
+                table: "scans",
                 column: "StudentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scans_UserId",
-                table: "Scans",
+                name: "IX_scans_UserId",
+                table: "scans",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_section_volunteer_SectionId",
-                table: "section_volunteer",
+                name: "IX_section_volunteers_SectionId",
+                table: "section_volunteers",
                 column: "SectionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_section_volunteer_UserId",
-                table: "section_volunteer",
+                name: "IX_section_volunteers_UserId",
+                table: "section_volunteers",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -420,50 +420,50 @@ namespace EventManagement.Migrations
                 column: "AddedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sessions_LastActivity",
-                table: "Sessions",
+                name: "IX_sessions_LastActivity",
+                table: "sessions",
                 column: "LastActivity");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Sessions_UserId",
-                table: "Sessions",
+                name: "IX_sessions_UserId",
+                table: "sessions",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_AddedBy",
-                table: "Students",
+                name: "IX_students_AddedBy",
+                table: "students",
                 column: "AddedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_QrCodePath",
-                table: "Students",
+                name: "IX_students_QrCodePath",
+                table: "students",
                 column: "QrCodePath");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_UniqueId",
-                table: "Students",
+                name: "IX_students_UniqueId",
+                table: "students",
                 column: "UniqueId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_UpdateBy",
-                table: "Students",
+                name: "IX_students_UpdateBy",
+                table: "students",
                 column: "UpdateBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Students_UserId",
-                table: "Students",
+                name: "IX_students_UserId",
+                table: "students",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_Email",
-                table: "Users",
+                name: "IX_users_Email",
+                table: "users",
                 column: "Email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_RoleId",
-                table: "Users",
+                name: "IX_users_RoleId",
+                table: "users",
                 column: "RoleId");
         }
 
@@ -471,40 +471,40 @@ namespace EventManagement.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "events");
 
             migrationBuilder.DropTable(
-                name: "IdCards");
+                name: "idcards");
 
             migrationBuilder.DropTable(
-                name: "ImportBatches");
+                name: "importbatches");
 
             migrationBuilder.DropTable(
-                name: "PasswordResetTokens");
+                name: "passwordresettokens");
 
             migrationBuilder.DropTable(
-                name: "permission_role");
+                name: "permission_roles");
 
             migrationBuilder.DropTable(
-                name: "Scans");
+                name: "scans");
 
             migrationBuilder.DropTable(
-                name: "section_volunteer");
+                name: "section_volunteers");
 
             migrationBuilder.DropTable(
-                name: "Sessions");
+                name: "sessions");
 
             migrationBuilder.DropTable(
-                name: "Permissions");
+                name: "permissions");
 
             migrationBuilder.DropTable(
-                name: "Students");
+                name: "students");
 
             migrationBuilder.DropTable(
                 name: "sections");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "users");
 
             migrationBuilder.DropTable(
                 name: "roles");

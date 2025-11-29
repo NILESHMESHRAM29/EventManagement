@@ -37,7 +37,7 @@ namespace EventManagement.Migrations
 
                     b.HasKey("Email");
 
-                    b.ToTable("PasswordResetTokens", (string)null);
+                    b.ToTable("passwordresettokens", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
@@ -84,7 +84,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UpdatedBy");
 
-                    b.ToTable("Events");
+                    b.ToTable("events", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.IdCard", b =>
@@ -124,7 +124,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("IdCards");
+                    b.ToTable("idcards", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.ImportBatch", b =>
@@ -165,7 +165,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UploadedBy");
 
-                    b.ToTable("ImportBatches");
+                    b.ToTable("importbatches", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Permission", b =>
@@ -199,7 +199,7 @@ namespace EventManagement.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Permissions");
+                    b.ToTable("permissions", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.PermissionRole", b =>
@@ -240,7 +240,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("permission_role", (string)null);
+                    b.ToTable("permission_roles", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Role", b =>
@@ -319,7 +319,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Scans");
+                    b.ToTable("scans", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Section", b =>
@@ -391,7 +391,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("section_volunteer", (string)null);
+                    b.ToTable("section_volunteers", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Session", b =>
@@ -423,7 +423,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Sessions", (string)null);
+                    b.ToTable("sessions", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Student", b =>
@@ -482,7 +482,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Students");
+                    b.ToTable("students", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.User", b =>
@@ -558,7 +558,7 @@ namespace EventManagement.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("EventManagement.Models.Event", b =>
