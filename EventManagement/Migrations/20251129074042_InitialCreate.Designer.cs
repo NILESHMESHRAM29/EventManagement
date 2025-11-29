@@ -12,7 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<< HEAD:EventManagement/Migrations/20251128231115_InitialCreate.Designer.cs
+<<<<<<<< HEAD:EventManagement/Migrations/20251128065412_InitialCreate.Designer.cs
+    [Migration("20251128065412_InitialCreate")]
+========
+    [Migration("20251128231115_InitialCreate")]
+>>>>>>>> 41012e6d991e96a6633c8c48dba4e9213ed9ee79:EventManagement/Migrations/20251128231115_InitialCreate.Designer.cs
+=======
     [Migration("20251129074042_InitialCreate")]
+>>>>>>> 6db23ed7363b1e7b7446589ee6d77922a2a39e8c:EventManagement/Migrations/20251129074042_InitialCreate.Designer.cs
     partial class InitialCreate
     {
         /// <inheritdoc />

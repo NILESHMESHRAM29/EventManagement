@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EventManagement.Data;
+using EventManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EventManagement.Data;
-using EventManagement.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EventManagement.Controllers
 {
@@ -20,14 +21,14 @@ namespace EventManagement.Controllers
         {
             _context = context;
         }
-
+        [Authorize]
         // GET: api/PermissionRoles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PermissionRole>>> GetPermissionRoles()
         {
             return await _context.PermissionRoles.ToListAsync();
         }
-
+        [Authorize]
         // GET: api/PermissionRoles/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PermissionRole>> GetPermissionRole(int id)
@@ -41,7 +42,7 @@ namespace EventManagement.Controllers
 
             return permissionRole;
         }
-
+        [Authorize]
         // PUT: api/PermissionRoles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
@@ -72,7 +73,7 @@ namespace EventManagement.Controllers
 
             return NoContent();
         }
-
+        [Authorize]
         // POST: api/PermissionRoles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -83,7 +84,7 @@ namespace EventManagement.Controllers
 
             return CreatedAtAction("GetPermissionRole", new { id = permissionRole.Id }, permissionRole);
         }
-
+        [Authorize]
         // DELETE: api/PermissionRoles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePermissionRole(int id)
