@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventManagement.Controllers
 {
     [ApiController]
-    [Route("api/idCards")]
+    [Route("api/[controller]")]
     public class IdCardController : ControllerBase
     {
         private readonly IdCardPdfService _pdfService;
