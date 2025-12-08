@@ -1,13 +1,10 @@
 ﻿using EventManagement.Data;
+using EventManagement.DTOs;
 using EventManagement.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace EventManagement.Controllers
 {
@@ -21,89 +18,82 @@ namespace EventManagement.Controllers
         {
             _context = context;
         }
+
         [Authorize]
-        // GET: api/Events
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
         {
             return await _context.Events.ToListAsync();
         }
+
         [Authorize]
-        // GET: api/Events/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Event>> GetEvent(int id)
         {
             var @event = await _context.Events.FindAsync(id);
-
             if (@event == null)
-            {
                 return NotFound();
-            }
 
             return @event;
         }
+
         [Authorize]
-        // PUT: api/Events/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutEvent(int id, Event @event)
+        [HttpPost]
+        public async Task<ActionResult<Event>> PostEvent([FromBody] EventCreateDto dto)
         {
-            if (id != @event.Id)
-            {
-                return BadRequest();
-            }
+            var userId = int.Parse(User.Claims.First(c => c.Type == "userId").Value);
 
-            _context.Entry(@event).State = EntityState.Modified;
+            var newEvent = new Event
+            {
+                Title = dto.Title,
+                Description = dto.Description,
+                EventDate = dto.EventDate,
+                AddedBy = userId,
+                UpdatedBy = userId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!EventExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            _context.Events.Add(newEvent);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetEvent), new { id = newEvent.Id }, newEvent);
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutEvent(int id, [FromBody] EventUpdateDto dto)
+        {
+            var existingEvent = await _context.Events.FindAsync(id);
+            if (existingEvent == null)
+                return NotFound();
+
+            var userId = int.Parse(User.Claims.First(c => c.Type == "userId").Value);
+
+            existingEvent.Title = dto.Title;
+            existingEvent.Description = dto.Description;
+            existingEvent.EventDate = dto.EventDate;
+            existingEvent.UpdatedBy = userId;
+            existingEvent.UpdatedAt = DateTime.UtcNow;
+
+            _context.Entry(existingEvent).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
-        [Authorize]
-        // POST: api/Events
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event @event)
-        {
-            _context.Events.Add(@event);
-            await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEvent", new { id = @event.Id }, @event);
-        }
         [Authorize]
-        // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             var @event = await _context.Events.FindAsync(id);
             if (@event == null)
-            {
                 return NotFound();
-            }
 
             _context.Events.Remove(@event);
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool EventExists(int id)
-        {
-            return _context.Events.Any(e => e.Id == id);
         }
     }
 }
