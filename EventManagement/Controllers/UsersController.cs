@@ -1,13 +1,11 @@
 ﻿using EventManagement.Data;
 using EventManagement.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace EventManagement.Controllers
 {
@@ -22,37 +20,35 @@ namespace EventManagement.Controllers
         {
             _context = context;
         }
-        [Authorize]
-        // GET: api/Users
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
         }
-        [Authorize]
-        // GET: api/Users/5
+
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
 
             return user;
         }
-        [Authorize]
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
+            if (id != user.Id) return BadRequest();
+
+            // Get logged-in user ID from JWT
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized("User ID claim is missing.");
+
+            var loggedInUserId = int.Parse(userIdClaim);
+
+            // Optional: only allow users to update their own data
+            if (loggedInUserId != id) return Forbid("You can only update your own profile.");
 
             _context.Entry(user).State = EntityState.Modified;
 
@@ -62,39 +58,35 @@ namespace EventManagement.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                if (!UserExists(id)) return NotFound();
+                throw;
             }
 
             return NoContent();
         }
-        [Authorize]
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
-        [Authorize]
-        // DELETE: api/Users/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
+            if (user == null) return NotFound();
+
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized("User ID claim is missing.");
+
+            var loggedInUserId = int.Parse(userIdClaim);
+
+            // Optional: only allow deleting own account or admin check
+            if (loggedInUserId != id) return Forbid("You can only delete your own account.");
 
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();

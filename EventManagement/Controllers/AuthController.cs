@@ -32,7 +32,6 @@ namespace EventManagement.Controllers
             if (await _db.Users.AnyAsync(x => x.Mobile == dto.Mobile))
                 return BadRequest("Mobile number already exists");
 
-            // 🔐 Strong password validation
             if (!IsValidPassword(dto.Password))
                 return BadRequest("Password must be at least 6 characters long and include uppercase, lowercase, number, and special character.");
 
@@ -52,9 +51,6 @@ namespace EventManagement.Controllers
             return Ok("Registration successful");
         }
 
-        // ==============================
-        // 🔐 Password Validation Method
-        // ==============================
         private bool IsValidPassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
@@ -68,7 +64,6 @@ namespace EventManagement.Controllers
             return hasUpper && hasLower && hasDigit && hasSpecial;
         }
 
-
         // ---------------- LOGIN ----------------
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
@@ -79,19 +74,15 @@ namespace EventManagement.Controllers
             if (user == null)
                 return Unauthorized("Invalid credentials");
 
-            // Lockout check
             if (user.LockoutEnd > DateTime.UtcNow)
                 return Unauthorized("Account locked. Try later.");
 
-            // verify hashed password
             if (!_hasher.VerifyPassword(user.Password, dto.Password))
             {
                 user.FailedLoginAttempts++;
 
                 if (user.FailedLoginAttempts >= 5)
-                {
                     user.LockoutEnd = DateTime.UtcNow.AddMinutes(10);
-                }
 
                 await _db.SaveChangesAsync();
                 return Unauthorized("Invalid credentials");
@@ -100,6 +91,7 @@ namespace EventManagement.Controllers
             // Reset failed attempts
             user.FailedLoginAttempts = 0;
 
+            // 🔹 Generate JWT with userId claim
             string accessToken = _jwt.GenerateAccessToken(user);
             string refreshToken = _jwt.GenerateRefreshToken();
 

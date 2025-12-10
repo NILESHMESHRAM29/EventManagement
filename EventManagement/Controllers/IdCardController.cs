@@ -1,9 +1,11 @@
 ﻿using EventManagement.DTOs;
 using EventManagement.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EventManagement.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/events")]
     public class IdCardController : ControllerBase

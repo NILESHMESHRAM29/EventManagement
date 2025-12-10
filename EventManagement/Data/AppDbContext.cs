@@ -24,6 +24,19 @@ namespace EventManagement.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // 💡 APPLY GLOBAL DATE/TIME CONVERTER FIX
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    // Check for both DateTime and nullable DateTime? types
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        // Apply the converter that changes Kind=UTC to Kind=Unspecified
+                        property.SetValueConverter(ValueConverters.UtcToUnspecifiedConverter);
+                    }
+                }
+            }
             base.OnModelCreating(modelBuilder);
 
             // USERS - lowercase table
@@ -91,6 +104,10 @@ namespace EventManagement.Data
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SCANS
@@ -119,6 +136,10 @@ namespace EventManagement.Data
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ROLES
@@ -134,6 +155,10 @@ namespace EventManagement.Data
                       .HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -156,6 +181,10 @@ namespace EventManagement.Data
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ID CARDS
@@ -171,6 +200,10 @@ namespace EventManagement.Data
                 entity.Property(e => e.IsDelete).HasDefaultValue(false);
 
                 entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -192,7 +225,12 @@ namespace EventManagement.Data
 
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
                 entity.Property(e => e.IsDelete).HasDefaultValue(false);
+
                 entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -215,12 +253,26 @@ namespace EventManagement.Data
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // EVENTS
             modelBuilder.Entity<Event>(entity =>
             {
                 entity.ToTable("events");
+
+                entity.Property(e => e.Title)
+                      .IsRequired()
+                      .HasMaxLength(255); // ✔ varchar(255)
+
+                entity.Property(e => e.Description)
+                      .HasColumnType("text"); // unlimited text
+
+                entity.Property(e => e.EventDate)
+                      .HasColumnType("timestamp"); // explicit timestamp mapping
 
                 entity.Property(e => e.IsDelete)
                       .HasDefaultValue(false);
@@ -240,6 +292,10 @@ namespace EventManagement.Data
                 entity.Property(e => e.CreatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SECTIONS
@@ -256,6 +312,10 @@ namespace EventManagement.Data
                       .OnDelete(DeleteBehavior.Restrict);
 
                 entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
@@ -279,6 +339,10 @@ namespace EventManagement.Data
                       .HasDefaultValue(true);
 
                 entity.Property(e => e.CreatedAt)
+                      .HasColumnType("timestamp")
+                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.Property(e => e.UpdatedAt)
                       .HasColumnType("timestamp")
                       .HasDefaultValueSql("CURRENT_TIMESTAMP");
             });

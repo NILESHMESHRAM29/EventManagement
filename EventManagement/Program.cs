@@ -1,4 +1,5 @@
-﻿using EventManagement.Data;
+﻿using AutoMapper;
+using EventManagement.Data;
 using EventManagement.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +33,9 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
+    .EnableSensitiveDataLogging()     
+    .EnableDetailedErrors()
+
 );
 
 // -------------------- SERVICES --------------------
@@ -41,6 +45,9 @@ builder.Services.AddScoped<IdCardPdfService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // -------------------- SWAGGER --------------------
 builder.Services.AddSwaggerGen(options =>

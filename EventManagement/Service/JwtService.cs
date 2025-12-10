@@ -20,7 +20,8 @@ namespace EventManagement.Service
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  // Standard claim
+                new Claim("userId", user.Id.ToString()),                    // ✅ Custom claim for your controllers
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty)
             };
 
