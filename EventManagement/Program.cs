@@ -8,6 +8,8 @@ using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using System.Text;
 
+
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
 
 // -------------------- QUESTPDF LICENSE --------------------
