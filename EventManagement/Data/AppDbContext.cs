@@ -1,6 +1,7 @@
 ﻿using EventManagement.DTOs;
 using EventManagement.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace EventManagement.Data
 {
@@ -24,28 +25,37 @@ namespace EventManagement.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // 💡 APPLY GLOBAL DATE/TIME CONVERTER FIX
+            // -----------------------------------------------------------
+            // ✅ APPLY GLOBAL UTC DateTime CONVERTER
+            // -----------------------------------------------------------
+            var utcConverter = new ValueConverter<DateTime, DateTime>(
+                v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                v => DateTime.SpecifyKind(v, DateTimeKind.Utc)
+            );
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())
                 {
-                    // Check for both DateTime and nullable DateTime? types
                     if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
                     {
-                        // Apply the converter that changes Kind=UTC to Kind=Unspecified
-                        property.SetValueConverter(ValueConverters.UtcToUnspecifiedConverter);
+                        property.SetValueConverter(utcConverter);
                     }
                 }
             }
+
             base.OnModelCreating(modelBuilder);
 
-            // USERS - lowercase table
+            // -----------------------------------------------------------
+            // TABLE CONFIGURATIONS (UNCHANGED)
+            // -----------------------------------------------------------
+
+            // USERS
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("users");
 
-                entity.HasIndex(e => e.Email)
-                      .IsUnique();
+                entity.HasIndex(e => e.Email).IsUnique();
 
                 entity.HasOne(u => u.Role)
                       .WithMany()
@@ -53,11 +63,9 @@ namespace EventManagement.Data
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // PASSWORD RESET TOKENS
             modelBuilder.Entity<PasswordResetToken>()
                 .ToTable("passwordresettokens");
 
-            // SESSIONS
             modelBuilder.Entity<Session>()
                 .ToTable("sessions");
 
@@ -75,8 +83,7 @@ namespace EventManagement.Data
             {
                 entity.ToTable("students");
 
-                entity.HasIndex(e => e.UniqueId)
-                      .IsUnique();
+                entity.HasIndex(e => e.UniqueId).IsUnique();
 
                 entity.HasIndex(e => e.QrCodePath)
                       .IsUnique(false);
@@ -98,16 +105,9 @@ namespace EventManagement.Data
                       .IsRequired(false)
                       .OnDelete(DeleteBehavior.SetNull);
 
-                entity.Property(e => e.IsDelete)
-                      .HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SCANS
@@ -130,37 +130,19 @@ namespace EventManagement.Data
                       .HasForeignKey(s => s.SectionId)
                       .OnDelete(DeleteBehavior.Cascade);
 
-                entity.Property(e => e.IsDelete)
-                      .HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ROLES
             modelBuilder.Entity<Role>(entity =>
             {
                 entity.ToTable("roles");
-
-                entity.Property(e => e.Name)
-                      .IsRequired()
-                      .HasMaxLength(100);
-
-                entity.Property(e => e.IsDelete)
-                      .HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // IMPORT BATCHES
@@ -178,13 +160,8 @@ namespace EventManagement.Data
                 entity.Property(e => e.ProcessedRows).HasDefaultValue(0);
                 entity.Property(e => e.IsCompleted).HasDefaultValue(false);
 
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // ID CARDS
@@ -198,14 +175,8 @@ namespace EventManagement.Data
                       .OnDelete(DeleteBehavior.Cascade);
 
                 entity.Property(e => e.IsDelete).HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // PERMISSION ROLE
@@ -225,126 +196,56 @@ namespace EventManagement.Data
 
                 entity.Property(e => e.IsActive).HasDefaultValue(true);
                 entity.Property(e => e.IsDelete).HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // PERMISSIONS
             modelBuilder.Entity<Permission>(entity =>
             {
                 entity.ToTable("permissions");
-
-                entity.Property(e => e.Name)
-                      .IsRequired()
-                      .HasMaxLength(100);
-
-                entity.HasIndex(e => e.Name)
-                      .IsUnique();
-
-                entity.Property(e => e.IsDelete)
-                      .HasDefaultValue(false);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // EVENTS
             modelBuilder.Entity<Event>(entity =>
             {
                 entity.ToTable("events");
+                entity.Property(e => e.Title).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.Description).HasColumnType("text");
+                entity.Property(e => e.EventDate).HasColumnType("timestamp");
+                entity.Property(e => e.IsDelete).HasDefaultValue(false);
 
-                entity.Property(e => e.Title)
-                      .IsRequired()
-                      .HasMaxLength(255); // ✔ varchar(255)
+                entity.HasOne(e => e.AddedByUser).WithMany().HasForeignKey(e => e.AddedBy).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.UpdatedByUser).WithMany().HasForeignKey(e => e.UpdatedBy).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.Description)
-                      .HasColumnType("text"); // unlimited text
-
-                entity.Property(e => e.EventDate)
-                      .HasColumnType("timestamp"); // explicit timestamp mapping
-
-                entity.Property(e => e.IsDelete)
-                      .HasDefaultValue(false);
-
-                entity.HasOne(e => e.AddedByUser)
-                      .WithMany()
-                      .HasForeignKey(e => e.AddedBy)
-                      .IsRequired(false)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.HasOne(e => e.UpdatedByUser)
-                      .WithMany()
-                      .HasForeignKey(e => e.UpdatedBy)
-                      .IsRequired(false)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SECTIONS
             modelBuilder.Entity<Section>(entity =>
             {
                 entity.ToTable("sections");
-
                 entity.Property(e => e.IsDelete).HasDefaultValue(false);
-
-                entity.HasOne(s => s.AddedByUser)
-                      .WithMany()
-                      .HasForeignKey(s => s.AddedBy)
-                      .IsRequired(false)
-                      .OnDelete(DeleteBehavior.Restrict);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasOne(s => s.AddedByUser).WithMany().HasForeignKey(s => s.AddedBy).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
             // SECTION VOLUNTEERS
             modelBuilder.Entity<SectionVolunteer>(entity =>
             {
                 entity.ToTable("section_volunteers");
-
-                entity.HasOne(sv => sv.Section)
-                      .WithMany()
-                      .HasForeignKey(sv => sv.SectionId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(sv => sv.User)
-                      .WithMany()
-                      .HasForeignKey(sv => sv.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
-
-                entity.Property(e => e.IsActive)
-                      .HasDefaultValue(true);
-
-                entity.Property(e => e.CreatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                entity.Property(e => e.UpdatedAt)
-                      .HasColumnType("timestamp")
-                      .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.HasOne(sv => sv.Section).WithMany().HasForeignKey(sv => sv.SectionId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(sv => sv.User).WithMany().HasForeignKey(sv => sv.UserId).OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.CreatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UpdatedAt).HasColumnType("timestamp").HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
         }
     }
