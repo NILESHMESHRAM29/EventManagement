@@ -7,7 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using QuestPDF.Infrastructure;
 using System.Text;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 var builder = WebApplication.CreateBuilder(args);
@@ -35,9 +36,8 @@ string connectionString = builder.Configuration.GetConnectionString("DefaultConn
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString)
-    .EnableSensitiveDataLogging()     
-    .EnableDetailedErrors()
-
+           .EnableSensitiveDataLogging()
+           .EnableDetailedErrors()
 );
 
 // -------------------- SERVICES --------------------
@@ -45,10 +45,17 @@ builder.Services.AddSingleton<IPasswordHasherService, PasswordHasherService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<IdCardPdfService>();
 
-builder.Services.AddControllers();
+// -------------------- CONTROLLERS WITH LOWERCASE JSON --------------------
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Custom naming policy to convert all property names to lowercase
+        options.JsonSerializerOptions.PropertyNamingPolicy = new LowerCaseNamingPolicy();
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.WriteIndented = true;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
-
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // -------------------- SWAGGER --------------------
@@ -129,3 +136,12 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// -------------------- CUSTOM LOWERCASE NAMING POLICY --------------------
+public class LowerCaseNamingPolicy : JsonNamingPolicy
+{
+    public override string ConvertName(string name)
+    {
+        return name.ToLower(); // converts all JSON property names to lowercase
+    }
+}

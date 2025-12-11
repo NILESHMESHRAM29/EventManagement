@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EventManagement.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/events")]
     [ApiController]
     public class EventController : ControllerBase
     {

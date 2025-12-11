@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace EventManagement.Models
 {
@@ -11,6 +12,7 @@ namespace EventManagement.Models
 
         public string? Description { get; set; }
 
+        [JsonPropertyName("eventdate")]
         public DateTime EventDate { get; set; }
 
         public bool IsDelete { get; set; } = false;
