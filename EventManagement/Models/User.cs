@@ -36,8 +36,8 @@ namespace EventManagement.Models
         
         public bool IsApproved { get; set; } = false;
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }= DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; }= DateTime.UtcNow;
 
         public ICollection<Student>? Students { get; set; }
         public int FailedLoginAttempts { get; set; }
