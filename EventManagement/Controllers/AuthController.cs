@@ -22,10 +22,41 @@ namespace EventManagement.Controllers
             _hasher = hasher;
         }
 
+        // ---------------- EMAIL VALIDATION ----------------
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // ---------------- PASSWORD VALIDATION ----------------
+        private bool IsValidPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
+                return false;
+
+            bool hasUpper = password.Any(char.IsUpper);
+            bool hasLower = password.Any(char.IsLower);
+            bool hasDigit = password.Any(char.IsDigit);
+            bool hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
+
+            return hasUpper && hasLower && hasDigit && hasSpecial;
+        }
+
         // ---------------- REGISTER ----------------
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
+            if (!IsValidEmail(dto.Email))
+                return BadRequest("Please enter a valid email address.");
+
             if (await _db.Users.AnyAsync(x => x.Email == dto.Email))
                 return BadRequest("Email already exists");
 
@@ -51,25 +82,13 @@ namespace EventManagement.Controllers
             return Ok("Registration successful");
         }
 
-        private bool IsValidPassword(string password)
-        {
-            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-                return false;
-
-            bool hasUpper = password.Any(char.IsUpper);
-            bool hasLower = password.Any(char.IsLower);
-            bool hasDigit = password.Any(char.IsDigit);
-            bool hasSpecial = password.Any(ch => !char.IsLetterOrDigit(ch));
-
-            return hasUpper && hasLower && hasDigit && hasSpecial;
-        }
-
         // ---------------- LOGIN ----------------
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _db.Users.Include(u => u.Role)
-                                      .FirstOrDefaultAsync(x => x.Email == dto.Email);
+            var user = await _db.Users
+                                .Include(u => u.Role)
+                                .FirstOrDefaultAsync(x => x.Email == dto.Email);
 
             if (user == null)
                 return Unauthorized("Invalid credentials");
@@ -91,7 +110,7 @@ namespace EventManagement.Controllers
             // Reset failed attempts
             user.FailedLoginAttempts = 0;
 
-            // 🔹 Generate JWT with userId claim
+            // Generate tokens
             string accessToken = _jwt.GenerateAccessToken(user);
             string refreshToken = _jwt.GenerateRefreshToken();
 
@@ -112,7 +131,8 @@ namespace EventManagement.Controllers
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(TokenResponseDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(x => x.RefreshToken == dto.RefreshToken);
+            var user = await _db.Users
+                                .FirstOrDefaultAsync(x => x.RefreshToken == dto.RefreshToken);
 
             if (user == null || user.RefreshTokenExpiryTime < DateTime.UtcNow)
                 return Unauthorized("Invalid refresh token");
