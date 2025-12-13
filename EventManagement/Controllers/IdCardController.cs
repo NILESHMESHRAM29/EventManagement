@@ -7,7 +7,7 @@ namespace EventManagement.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/events")]
+    [Route("api/idcrads")]
     public class IdCardController : ControllerBase
     {
         private readonly IdCardPdfService _pdfService;
