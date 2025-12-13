@@ -1,13 +1,11 @@
-﻿using EventManagement.Data;
+﻿using AutoMapper;
+using EventManagement.Data;
+using EventManagement.DTOs;
 using EventManagement.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace EventManagement.Controllers
 {
@@ -16,22 +14,29 @@ namespace EventManagement.Controllers
     public class SectionsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public SectionsController(AppDbContext context)
+        public SectionsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
+
+        // GET: api/sections
         [Authorize]
-        // GET: api/Sections
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Section>>> GetSections()
+        public async Task<ActionResult<IEnumerable<SectionDto>>> GetSections()
         {
-            return await _context.Sections.ToListAsync();
+            var sections = await _context.Sections.ToListAsync();
+            var sectionDtos = _mapper.Map<List<SectionDto>>(sections);
+
+            return Ok(sectionDtos);
         }
+
+        // GET: api/sections/5
         [Authorize]
-        // GET: api/Sections/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Section>> GetSection(int id)
+        public async Task<ActionResult<SectionDto>> GetSection(int id)
         {
             var section = await _context.Sections.FindAsync(id);
 
@@ -40,57 +45,48 @@ namespace EventManagement.Controllers
                 return NotFound();
             }
 
-            return section;
+            var sectionDto = _mapper.Map<SectionDto>(section);
+            return Ok(sectionDto);
         }
+
+        // PUT: api/sections/5
         [Authorize]
-        // PUT: api/Sections/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSection(int id, Section section)
+        public async Task<IActionResult> PutSection(int id, SectionDto sectionDto)
         {
-            if (id != section.Id)
+            var section = await _context.Sections.FindAsync(id);
+
+            if (section == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(section).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SectionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            _mapper.Map(sectionDto, section);
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
+        // POST: api/sections
         [Authorize]
-        // POST: api/Sections
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Section>> PostSection(Section section)
+        public async Task<ActionResult> PostSection(SectionDto sectionDto)
         {
+            var section = _mapper.Map<Section>(sectionDto);
+
             _context.Sections.Add(section);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSection", new { id = section.Id }, section);
+            return CreatedAtAction(nameof(GetSection), new { id = section.Id }, sectionDto);
         }
 
+        // DELETE: api/sections/5
         [Authorize]
-        // DELETE: api/Sections/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSection(int id)
         {
             var section = await _context.Sections.FindAsync(id);
+
             if (section == null)
             {
                 return NotFound();
@@ -100,11 +96,6 @@ namespace EventManagement.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool SectionExists(int id)
-        {
-            return _context.Sections.Any(e => e.Id == id);
         }
     }
 }
