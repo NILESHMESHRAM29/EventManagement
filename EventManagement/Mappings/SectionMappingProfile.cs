@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using EventManagement.DTOs;
+using EventManagement.Models;
 
 namespace EventManagement.Mappings
 {
@@ -6,7 +8,12 @@ namespace EventManagement.Mappings
     {
         public SectionMappingProfile()
         {
-            CreateMap<DTOs.SectionDto, Models.Section>()
+            // Entity → DTO (GET)
+            CreateMap<Section, SectionDto>()
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.Name));
+
+            // DTO → Entity (POST / PUT)
+            CreateMap<SectionDto, Section>()
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.name));
         }
     }
