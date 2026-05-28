@@ -22,7 +22,7 @@ namespace EventManagement.Controllers
             _hasher = hasher;
         }
 
-        // ---------------- EMAIL VALIDATION ----------------
+        
         private bool IsValidEmail(string email)
         {
             try
@@ -36,7 +36,7 @@ namespace EventManagement.Controllers
             }
         }
 
-        // ---------------- PASSWORD VALIDATION ----------------
+        
         private bool IsValidPassword(string password)
         {
             if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
@@ -50,7 +50,7 @@ namespace EventManagement.Controllers
             return hasUpper && hasLower && hasDigit && hasSpecial;
         }
 
-        // ---------------- REGISTER ----------------
+        
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
@@ -82,7 +82,7 @@ namespace EventManagement.Controllers
             return Ok("Registration successful");
         }
 
-        // ---------------- LOGIN ----------------
+      
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
@@ -127,7 +127,7 @@ namespace EventManagement.Controllers
             });
         }
 
-        // ---------------- REFRESH TOKEN ----------------
+      
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh(TokenResponseDto dto)
         {
